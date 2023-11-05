@@ -25,7 +25,7 @@ func (d *Duration) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// Std returns d as time.Duration.
-func (d *Duration) Std() time.Duration {
+// Standard returns d as time.Duration in standard library.
+func (d *Duration) Standard() time.Duration {
 	return time.Duration(*d)
 }

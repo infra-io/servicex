@@ -1,6 +1,6 @@
 module github.com/FishGoddess/servicex
 
-go 1.18
+go 1.21
 
 require (
 	github.com/FishGoddess/logit v1.2.0

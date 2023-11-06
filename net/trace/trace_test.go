@@ -9,26 +9,24 @@ import (
 	"testing"
 )
 
-// go test -v -cover -run=^TestTraceID$
-func TestTraceID(t *testing.T) {
-	traceID := ID()
-	if traceID == "" {
-		t.Error("traceID is wrong")
-	}
+// go test -v -cover -run=^TestNew$
+func TestNew(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		traceID := New()
+		if traceID == "" {
+			t.Error("traceID is wrong")
+		}
 
-	t.Log(traceID)
+		t.Log(traceID)
+	}
 }
 
-// go test -v -cover -run=^TestWithID$
-func TestWithID(t *testing.T) {
-	ctx := context.Background()
+// go test -v -cover -run=^TestNewContext$
+func TestNewContext(t *testing.T) {
+	traceID := New()
+	ctx := NewContext(context.Background(), traceID)
 
-	ctx, traceID := WithID(ctx)
-	if traceID == "" {
-		t.Error("traceID == ''")
-	}
-
-	value := ctx.Value(idContextKey)
+	value := ctx.Value(contextKey)
 	if value == nil {
 		t.Error("ctx.Value returns nil")
 	}
@@ -41,11 +39,15 @@ func TestWithID(t *testing.T) {
 }
 
 // go test -v -cover -run=^TestNewContext$
-func TestNewContext(t *testing.T) {
-	traceID := ID()
-	ctx := NewContext(context.Background(), traceID)
+func TestNewContextWithID(t *testing.T) {
+	ctx := context.Background()
 
-	value := ctx.Value(idContextKey)
+	ctx, traceID := NewContextWithID(ctx)
+	if traceID == "" {
+		t.Error("traceID == ''")
+	}
+
+	value := ctx.Value(contextKey)
 	if value == nil {
 		t.Error("ctx.Value returns nil")
 	}
@@ -66,8 +68,8 @@ func TestFromContext(t *testing.T) {
 		t.Errorf("traceIDInCtx %s != ''", traceIDInCtx)
 	}
 
-	traceID := ID()
-	ctx = context.WithValue(ctx, idContextKey, traceID)
+	traceID := New()
+	ctx = context.WithValue(ctx, contextKey, traceID)
 
 	traceIDInCtx = FromContext(ctx)
 	if traceIDInCtx != traceID {

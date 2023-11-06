@@ -5,19 +5,14 @@
 package rand
 
 import (
+	"encoding/base64"
 	"math/rand"
-	"strings"
 	"time"
-
-	"github.com/FishGoddess/logit"
-	uuidlib "github.com/google/uuid"
-)
-
-const (
-	uuidLength = 32
 )
 
 var (
+	random *rand.Rand
+
 	letters = [62]byte{
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 		'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
@@ -27,28 +22,26 @@ var (
 	}
 )
 
-var (
-	random = rand.New(rand.NewSource(time.Now().Unix()))
-)
-
-// String returns a random string including 0-9/a-z/A-Z not longer than length.
-func String(length int) string {
-	b := make([]byte, length)
-	for i := 0; i < length; i++ {
-		index := random.Intn(len(letters))
-		b[i] = letters[index]
-	}
-
-	return string(b)
+func init() {
+	now := time.Now().Unix()
+	source := rand.NewSource(now)
+	random = rand.New(source)
 }
 
-// UUID returns an uuid of version 4 or a random string if failed.
-func UUID() string {
-	uuid, err := uuidlib.NewRandom()
-	if err != nil {
-		logit.Error(err, "new uuid failed").Log()
-		return String(uuidLength)
+// GenerateString generates a string including n letters in random.
+func GenerateString(n int) string {
+	bs := make([]byte, n)
+	for i := 0; i < n; i++ {
+		index := random.Intn(len(letters))
+		bs[i] = letters[index]
 	}
 
-	return strings.ReplaceAll(uuid.String(), "-", "")
+	return string(bs)
+}
+
+// GenerateToken generates a string in base64 for token usages.
+func GenerateToken(n int) string {
+	token := GenerateString(n)
+	token = base64.StdEncoding.EncodeToString([]byte(token))
+	return token
 }

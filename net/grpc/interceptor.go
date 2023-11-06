@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT style
 // license that can be found in the LICENSE file.
 
-package interceptors
+package grpc
 
 import (
 	"context"
@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/FishGoddess/logit"
+	"github.com/FishGoddess/servicex/net/trace"
 	"github.com/FishGoddess/servicex/runtime"
-	"github.com/FishGoddess/servicex/trace"
 	"google.golang.org/grpc"
 )
 
@@ -24,16 +24,16 @@ func shortMethod(info *grpc.UnaryServerInfo) string {
 	return info.FullMethod
 }
 
-// Trace sets a trace id to context.
-func Trace() grpc.UnaryServerInterceptor {
+// TraceInterceptor sets a trace id to context.
+func TraceInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
-		ctx, _ = trace.WithID(ctx)
+		ctx, _ = trace.NewContextWithID(ctx)
 		return handler(ctx, req)
 	}
 }
 
-// Recovery protects goroutine from panic.
-func Recovery() grpc.UnaryServerInterceptor {
+// RecoveryInterceptor protects goroutine from panic.
+func RecoveryInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
 		defer func() {
 			if r := recover(); r != nil {
@@ -46,8 +46,8 @@ func Recovery() grpc.UnaryServerInterceptor {
 	}
 }
 
-// Cost records the cost of method.
-func Cost() grpc.UnaryServerInterceptor {
+// CostInterceptor records the cost of method.
+func CostInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
 		begin := time.Now()
 		method := shortMethod(info)
@@ -62,8 +62,8 @@ func Cost() grpc.UnaryServerInterceptor {
 	}
 }
 
-// Timeout sets timeout to context.
-func Timeout(timeout time.Duration) grpc.UnaryServerInterceptor {
+// TimeoutInterceptor sets timeout to context.
+func TimeoutInterceptor(timeout time.Duration) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
 		newCtx, cancel := context.WithTimeout(ctx, timeout)
 		defer cancel()

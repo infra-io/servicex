@@ -6,9 +6,9 @@ package rand
 
 import "testing"
 
-// go test -v -cover -run=^TestString$
-func TestString(t *testing.T) {
-	str := String(32)
+// go test -v -cover -run=^TestGenerateString$
+func TestGenerateString(t *testing.T) {
+	str := GenerateString(32)
 	if str == "" {
 		t.Error("str is wrong")
 	}
@@ -16,9 +16,9 @@ func TestString(t *testing.T) {
 	t.Log(str)
 }
 
-// go test -v -cover -run=^TestUUID$
-func TestUUID(t *testing.T) {
-	str := UUID()
+// go test -v -cover -run=^TestGenerateToken$
+func TestGenerateToken(t *testing.T) {
+	str := GenerateToken(48)
 	if str == "" {
 		t.Error("str is wrong")
 	}

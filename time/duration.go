@@ -9,11 +9,6 @@ import "time"
 // Duration is an alias of time.Duration for implementing method UnmarshalText.
 type Duration time.Duration
 
-// FromDuration creates duration from time.Duration.
-func FromDuration(d time.Duration) Duration {
-	return Duration(d)
-}
-
 // UnmarshalText unmarshal text to Duration.
 func (d *Duration) UnmarshalText(text []byte) error {
 	parsed, err := time.ParseDuration(string(text))
@@ -28,4 +23,9 @@ func (d *Duration) UnmarshalText(text []byte) error {
 // Standard returns d as time.Duration in standard library.
 func (d *Duration) Standard() time.Duration {
 	return time.Duration(*d)
+}
+
+// FromDuration creates duration from time.Duration.
+func FromDuration(d time.Duration) Duration {
+	return Duration(d)
 }

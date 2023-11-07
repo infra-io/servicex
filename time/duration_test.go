@@ -28,7 +28,7 @@ func TestDuration(t *testing.T) {
 		t.Errorf("d %d is wrong", d)
 	}
 
-	if d.Std() != time.Second {
-		t.Errorf("d.Std() %d is wrong", d.Std())
+	if d.Standard() != time.Second {
+		t.Errorf("d.Standard() %d is wrong", d.Standard())
 	}
 }

@@ -3,7 +3,7 @@ module github.com/FishGoddess/servicex
 go 1.21
 
 require (
-	github.com/FishGoddess/logit v1.2.0
+	github.com/FishGoddess/logit v1.2.1
 	go.uber.org/automaxprocs v1.5.2
 	google.golang.org/grpc v1.59.0
 )

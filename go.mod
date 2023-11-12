@@ -1,4 +1,4 @@
-module github.com/FishGoddess/servicex
+module github.com/infra-io/servicex
 
 go 1.21
 

@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/FishGoddess/logit"
-	"github.com/FishGoddess/servicex/net/trace"
-	"github.com/FishGoddess/servicex/runtime"
+	"github.com/infra-io/servicex/net/trace"
+	"github.com/infra-io/servicex/runtime"
 	"google.golang.org/grpc"
 )
 

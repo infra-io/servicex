@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"sync/atomic"
 
-	"github.com/FishGoddess/servicex/rand"
-	"github.com/FishGoddess/servicex/time"
+	"github.com/infra-io/servicex/rand"
+	"github.com/infra-io/servicex/time"
 )
 
 const (

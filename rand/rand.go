@@ -10,17 +10,15 @@ import (
 	"time"
 )
 
-var (
-	random *rand.Rand
+var random *rand.Rand
 
-	letters = [62]byte{
-		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-		'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-		'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-		'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-	}
-)
+var words = [62]byte{
+	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+	'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+	'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+	'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+}
 
 func init() {
 	now := time.Now().Unix()
@@ -28,12 +26,14 @@ func init() {
 	random = rand.New(source)
 }
 
-// GenerateString generates a string including n letters in random.
+// GenerateString generates a string including n words in random.
 func GenerateString(n int) string {
 	bs := make([]byte, n)
+	length := len(words)
+
 	for i := 0; i < n; i++ {
-		index := random.Intn(len(letters))
-		bs[i] = letters[index]
+		index := random.Intn(length)
+		bs[i] = words[index]
 	}
 
 	return string(bs)
@@ -41,7 +41,7 @@ func GenerateString(n int) string {
 
 // GenerateToken generates a string in base64 for token usages.
 func GenerateToken(n int) string {
-	token := GenerateString(n)
-	token = base64.StdEncoding.EncodeToString([]byte(token))
+	raw := GenerateString(n)
+	token := base64.StdEncoding.EncodeToString([]byte(raw))
 	return token
 }

@@ -4,24 +4,48 @@
 
 package rand
 
-import "testing"
+import (
+	"encoding/base64"
+	"testing"
+)
 
 // go test -v -cover -run=^TestGenerateString$
 func TestGenerateString(t *testing.T) {
-	str := GenerateString(32)
-	if str == "" {
-		t.Error("str is wrong")
-	}
+	n := 32
 
-	t.Log(str)
+	for i := 0; i < 10; i++ {
+		str := GenerateString(n)
+		if str == "" {
+			t.Error("str is wrong")
+		}
+
+		if len(str) != n {
+			t.Errorf("str length %d is wrong", len(str))
+		}
+
+		t.Log(str)
+	}
 }
 
 // go test -v -cover -run=^TestGenerateToken$
 func TestGenerateToken(t *testing.T) {
-	str := GenerateToken(48)
-	if str == "" {
-		t.Error("str is wrong")
-	}
+	n := 48
 
-	t.Log(str)
+	for i := 0; i < 10; i++ {
+		token := GenerateToken(n)
+		if token == "" {
+			t.Error("token is wrong")
+		}
+
+		raw, err := base64.StdEncoding.DecodeString(token)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if len(raw) != n {
+			t.Errorf("token length %d is wrong", len(raw))
+		}
+
+		t.Log(token)
+	}
 }

@@ -87,3 +87,8 @@ func (c *Clock) Now() time.Time {
 	nanos := atomic.LoadInt64(&c.now)
 	return time.Unix(0, nanos)
 }
+
+// Now returns the current time.
+func Now() time.Time {
+	return NewClock().Now()
+}

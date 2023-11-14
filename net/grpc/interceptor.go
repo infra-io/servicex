@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/FishGoddess/logit"
-	"github.com/infra-io/servicex/net/trace"
+	"github.com/infra-io/servicex/net/tracing"
 	"github.com/infra-io/servicex/runtime"
 	"google.golang.org/grpc"
 )
@@ -27,7 +27,8 @@ func shortMethod(info *grpc.UnaryServerInfo) string {
 // TraceInterceptor sets a trace id to context.
 func TraceInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
-		ctx, _ = trace.NewContextWithID(ctx)
+		trace := tracing.New()
+		ctx = tracing.NewContext(ctx, trace)
 		return handler(ctx, req)
 	}
 }

@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-// go test -v -cover -run=^TestGenerateString$
+// go test -v -cover -count=1 -test.cpu=1 -run=^TestGenerateString$
 func TestGenerateString(t *testing.T) {
 	n := 32
 
@@ -27,7 +27,7 @@ func TestGenerateString(t *testing.T) {
 	}
 }
 
-// go test -v -cover -run=^TestGenerateToken$
+// go test -v -cover -count=1 -test.cpu=1 -run=^TestGenerateToken$
 func TestGenerateToken(t *testing.T) {
 	n := 48
 

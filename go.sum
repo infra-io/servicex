@@ -1,5 +1,7 @@
 github.com/FishGoddess/logit v1.2.1 h1:Hpu4Hz8Q/CLia0moY8nmFB+9vziyw5s2FZ9tuUsegNQ=
 github.com/FishGoddess/logit v1.2.1/go.mod h1:a2dFSibwfZXNNZ/V1jMOQBImPoySaxdPFThbsm17ZdY=
+github.com/FishGoddess/logit v1.5.1-alpha h1:nF6JDTO/+3DnpeWluoTharEeWMTQu/iuNjYzxxBY13w=
+github.com/FishGoddess/logit v1.5.1-alpha/go.mod h1:6IAtVuIW3AaPTBn2NDfBnML7t0F7/wj1FFeWIPLJy98=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=

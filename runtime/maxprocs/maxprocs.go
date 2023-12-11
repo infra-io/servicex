@@ -12,7 +12,7 @@ import (
 func init() {
 	undo, err := maxprocs.Set(maxprocs.Logger(logit.Printf))
 	if err != nil {
-		logit.Error(err, "set maxprocs failed").Log()
+		logit.Error("set maxprocs failed", "err", err)
 		undo()
 	}
 }

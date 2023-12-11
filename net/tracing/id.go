@@ -31,5 +31,6 @@ func traceID() string {
 	str := rand.GenerateString(16)
 	seq := strconv.FormatUint(nextSequence(), 10)
 	traceID := str[:4] + now[:6] + str[4:8] + now[6:] + str[:12] + pid + str[12:] + seq
+
 	return traceID
 }

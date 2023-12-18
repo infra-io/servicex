@@ -29,6 +29,9 @@ func TraceInterceptor() grpc.UnaryServerInterceptor {
 		trace := tracing.New()
 		ctx = tracing.NewContext(ctx, trace)
 
+		logger := logit.FromContext(ctx).With("trace_id", trace.ID())
+		ctx = logit.NewContext(ctx, logger)
+
 		return handler(ctx, req)
 	}
 }
@@ -38,7 +41,7 @@ func RecoveryInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
 		defer func() {
 			if r := recover(); r != nil {
-				logit.ErrorContext(ctx, "recovery from panic", "r", r, "stack", runtime.Stack())
+				logit.FromContext(ctx).Error("recovery from panic", "r", r, "stack", runtime.Stack())
 			}
 		}()
 
@@ -52,12 +55,15 @@ func CostInterceptor() grpc.UnaryServerInterceptor {
 		begin := time.Now()
 		method := shortMethod(info)
 
-		logit.InfoContext(ctx, method+" begin", "request", req)
+		logger := logit.FromContext(ctx).With("method", method)
+		logger.Info("method begin", "request", req)
+
 		defer func() {
 			cost := time.Since(begin)
-			logit.InfoContext(ctx, method+" end", "response", resp, "cost", cost)
+			logger.Info("method end", "response", resp, "cost", cost)
 		}()
 
+		ctx = logit.NewContext(ctx, logger)
 		return handler(ctx, req)
 	}
 }

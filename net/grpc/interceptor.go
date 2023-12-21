@@ -6,7 +6,6 @@ package grpc
 
 import (
 	"context"
-	"fmt"
 	"path"
 	"time"
 
@@ -29,6 +28,10 @@ func TraceInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
 		trace := tracing.New()
 		ctx = tracing.NewContext(ctx, trace)
+
+		logger := logit.FromContext(ctx).With("trace_id", trace.ID())
+		ctx = logit.NewContext(ctx, logger)
+
 		return handler(ctx, req)
 	}
 }
@@ -38,8 +41,7 @@ func RecoveryInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
 		defer func() {
 			if r := recover(); r != nil {
-				err = fmt.Errorf("panic: %+v", r)
-				logit.Error(err, "recovery from panic").Any("r", r).String("stack", runtime.Stack()).LogX(ctx)
+				logit.FromContext(ctx).Error("recovery from panic", "r", r, "stack", runtime.Stack())
 			}
 		}()
 
@@ -49,16 +51,19 @@ func RecoveryInterceptor() grpc.UnaryServerInterceptor {
 
 // CostInterceptor records the cost of method.
 func CostInterceptor() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
 		begin := time.Now()
 		method := shortMethod(info)
 
-		logit.Info("%s begin", method).Json("request", req).LogX(ctx)
+		logger := logit.FromContext(ctx).With("method", method)
+		logger.Info("method begin", "request", req)
+
 		defer func() {
 			cost := time.Since(begin)
-			logit.Info("%s end", method).Json("response", req).Duration("cost", cost).LogX(ctx)
+			logger.Info("method end", "response", resp, "cost", cost)
 		}()
 
+		ctx = logit.NewContext(ctx, logger)
 		return handler(ctx, req)
 	}
 }

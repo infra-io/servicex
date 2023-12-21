@@ -43,5 +43,6 @@ func GenerateString(n int) string {
 func GenerateToken(n int) string {
 	raw := GenerateString(n)
 	token := base64.StdEncoding.EncodeToString([]byte(raw))
+
 	return token
 }

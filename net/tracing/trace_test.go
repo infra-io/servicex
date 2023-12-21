@@ -9,7 +9,17 @@ import (
 	"testing"
 )
 
-// go test -v -cover -run=^TestNew$
+// go test -bench=^BenchmarkNew$
+func BenchmarkNew(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		New()
+	}
+}
+
+// go test -v -cover -count=1 -test.cpu=1 -run=^TestNew$
 func TestNew(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		trace := New()
@@ -21,7 +31,7 @@ func TestNew(t *testing.T) {
 	}
 }
 
-// go test -v -cover -run=^TestNewContext$
+// go test -v -cover -count=1 -test.cpu=1 -run=^TestNewContext$
 func TestNewContext(t *testing.T) {
 	trace := New()
 	ctx := NewContext(context.Background(), trace)
@@ -38,7 +48,7 @@ func TestNewContext(t *testing.T) {
 	t.Log("traceID:", trace.ID())
 }
 
-// go test -v -cover -run=^TestFromContext$
+// go test -v -cover -count=1 -test.cpu=1 -run=^TestFromContext$
 func TestFromContext(t *testing.T) {
 	ctx := context.Background()
 

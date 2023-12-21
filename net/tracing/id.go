@@ -5,31 +5,31 @@
 package tracing
 
 import (
-	"os"
-	"strconv"
-	"sync/atomic"
+	"encoding/binary"
+	"encoding/hex"
 
 	"github.com/infra-io/servicex/rand"
 	"github.com/infra-io/servicex/time"
 )
 
-const (
-	timeFormat = "050415020106"
-)
+func numHex(num uint32) string {
+	var bs [4]byte
+	binary.BigEndian.PutUint32(bs[:], num)
 
-var (
-	pid = strconv.Itoa(os.Getpid())
-	seq = uint64(0)
-)
+	return hex.EncodeToString(bs[:])
+}
 
-func nextSequence() uint64 {
-	return atomic.AddUint64(&seq, 1)
+func now() string {
+	now := time.Now().Unix()
+	now = now / 86400
+
+	return numHex(uint32(now))
 }
 
 func traceID() string {
-	now := time.Now().Format(timeFormat)
-	str := rand.GenerateString(16)
-	seq := strconv.FormatUint(nextSequence(), 10)
-	traceID := str[:4] + now[:6] + str[4:8] + now[6:] + str[:12] + pid + str[12:] + seq
+	now := now()
+	str := rand.GenerateString(20)
+	traceID := str[:8] + now[4:6] + str[8:16] + now[6:] + str[16:]
+
 	return traceID
 }

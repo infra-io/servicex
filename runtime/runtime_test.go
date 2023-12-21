@@ -6,7 +6,7 @@ package runtime
 
 import "testing"
 
-// go test -v -cover -run=^TestStack$
+// go test -v -cover -count=1 -test.cpu=1 -run=^TestStack$
 func TestStack(t *testing.T) {
 	stack := Stack()
 	t.Log(stack)

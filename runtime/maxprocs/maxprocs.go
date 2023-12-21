@@ -10,9 +10,11 @@ import (
 )
 
 func init() {
-	undo, err := maxprocs.Set(maxprocs.Logger(logit.Printf))
+	logger := logit.Default()
+
+	undo, err := maxprocs.Set(maxprocs.Logger(logger.Printf))
 	if err != nil {
-		logit.Error(err, "set maxprocs failed").Log()
+		logger.Error("set maxprocs failed", "err", err)
 		undo()
 	}
 }

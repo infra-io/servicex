@@ -108,6 +108,8 @@ func CostInterceptor() grpc.UnaryServerInterceptor {
 }
 
 func CommonInterceptors(timeout time.Duration, opts ...logging.Option) []grpc.UnaryServerInterceptor {
+	opts = append(opts, logging.WithTraceID(), logging.WithServiceMethod())
+
 	interceptors := []grpc.UnaryServerInterceptor{
 		TraceInterceptor(), LogInterceptor(opts...), RecoveryInterceptor(), TimeoutInterceptor(timeout), CostInterceptor(),
 	}

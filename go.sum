@@ -4,6 +4,8 @@ github.com/FishGoddess/logit v1.5.4-alpha h1:jCYbtMKdBcg9Q7Tyn1itv2KuOY9LtmiqMsl
 github.com/FishGoddess/logit v1.5.4-alpha/go.mod h1:6IAtVuIW3AaPTBn2NDfBnML7t0F7/wj1FFeWIPLJy98=
 github.com/FishGoddess/logit v1.5.5-alpha h1:JnWcXWJI/wOH5Sf72UoJL+mefNaAe7Mve3w13i6UzoQ=
 github.com/FishGoddess/logit v1.5.5-alpha/go.mod h1:6IAtVuIW3AaPTBn2NDfBnML7t0F7/wj1FFeWIPLJy98=
+github.com/FishGoddess/logit v1.5.6-alpha h1:/xjpL94eE89YUHZDm1BVvFHZlFYD1MjPPmeTrKopkfM=
+github.com/FishGoddess/logit v1.5.6-alpha/go.mod h1:6IAtVuIW3AaPTBn2NDfBnML7t0F7/wj1FFeWIPLJy98=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/FishGoddess/logit"
+	"github.com/infra-io/servicex/net/logging"
 	"github.com/infra-io/servicex/net/tracing"
 	"github.com/infra-io/servicex/runtime"
 	"google.golang.org/grpc"
@@ -29,7 +30,37 @@ func TraceInterceptor() grpc.UnaryServerInterceptor {
 		trace := tracing.New()
 		ctx = tracing.NewContext(ctx, trace)
 
-		logger := logit.FromContext(ctx).With("trace_id", trace.ID())
+		return handler(ctx, req)
+	}
+}
+
+// LogInterceptor sets logging attributes to logger.
+func LogInterceptor(opts ...logging.Option) grpc.UnaryServerInterceptor {
+	conf := logging.NewDefaultConfig()
+
+	for _, opt := range opts {
+		opt.ApplyTo(conf)
+	}
+
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
+		args := make([]any, 0, 4)
+
+		if conf.WithTraceID {
+			trace := tracing.FromContext(ctx)
+			args = append(args, "service.trace_id", trace.ID())
+		}
+
+		if conf.WithServiceMethod {
+			method := shortMethod(info)
+			args = append(args, "service.method", method)
+		}
+
+		for _, resolve := range conf.Resolvers {
+			resolved := resolve(ctx, req)
+			args = append(args, resolved...)
+		}
+
+		logger := logit.FromContext(ctx).With(args...)
 		ctx = logit.NewContext(ctx, logger)
 
 		return handler(ctx, req)
@@ -49,25 +80,6 @@ func RecoveryInterceptor() grpc.UnaryServerInterceptor {
 	}
 }
 
-// CostInterceptor records the cost of method.
-func CostInterceptor() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
-		begin := time.Now()
-		method := shortMethod(info)
-
-		logger := logit.FromContext(ctx).With("method", method)
-		logger.Info("method begin", "request", req)
-
-		defer func() {
-			cost := time.Since(begin)
-			logger.Info("method end", "response", resp, "cost", cost)
-		}()
-
-		ctx = logit.NewContext(ctx, logger)
-		return handler(ctx, req)
-	}
-}
-
 // TimeoutInterceptor sets timeout to context.
 func TimeoutInterceptor(timeout time.Duration) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
@@ -76,4 +88,29 @@ func TimeoutInterceptor(timeout time.Duration) grpc.UnaryServerInterceptor {
 
 		return handler(newCtx, req)
 	}
+}
+
+// CostInterceptor records the cost of method.
+func CostInterceptor() grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
+		begin := time.Now()
+
+		logger := logit.FromContext(ctx)
+		logger.Debug("service method begin", "request", req)
+
+		defer func() {
+			cost := time.Since(begin)
+			logger.Debug("service method end", "response", resp, "err", err, "cost", cost)
+		}()
+
+		return handler(ctx, req)
+	}
+}
+
+func CommonInterceptors(timeout time.Duration, opts ...logging.Option) []grpc.UnaryServerInterceptor {
+	interceptors := []grpc.UnaryServerInterceptor{
+		TraceInterceptor(), LogInterceptor(opts...), RecoveryInterceptor(), TimeoutInterceptor(timeout), CostInterceptor(),
+	}
+
+	return interceptors
 }

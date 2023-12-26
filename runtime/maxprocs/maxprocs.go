@@ -9,12 +9,10 @@ import (
 	"go.uber.org/automaxprocs/maxprocs"
 )
 
-func init() {
-	logger := logit.Default()
-
-	undo, err := maxprocs.Set(maxprocs.Logger(logger.Printf))
+func Setup() {
+	undo, err := maxprocs.Set(maxprocs.Logger(logit.Printf))
 	if err != nil {
-		logger.Error("set maxprocs failed", "err", err)
+		logit.Error("set maxprocs failed", "err", err)
 		undo()
 	}
 }

@@ -6,6 +6,7 @@ package grpc
 
 import (
 	"context"
+	"encoding/json"
 	"path"
 	"time"
 
@@ -94,13 +95,24 @@ func TimeoutInterceptor(timeout time.Duration) grpc.UnaryServerInterceptor {
 func CostInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
 		begin := time.Now()
-
 		logger := logit.FromContext(ctx)
-		logger.Debug("service method begin", "request", req)
+
+		marshaled, jsonErr := json.Marshal(req)
+		if err != nil {
+			logger.Debug("service method begin", "request", req, "json_err", jsonErr)
+		} else {
+			logger.Debug("service method begin", "request", string(marshaled))
+		}
 
 		defer func() {
 			cost := time.Since(begin)
-			logger.Debug("service method end", "response", resp, "err", err, "cost", cost)
+
+			marshaled, jsonErr = json.Marshal(resp)
+			if err != nil {
+				logger.Debug("service method end", "response", resp, "err", err, "cost", cost, "jsonErr", jsonErr)
+			} else {
+				logger.Debug("service method end", "response", string(marshaled), "err", err, "cost", cost)
+			}
 		}()
 
 		return handler(ctx, req)

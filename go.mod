@@ -3,7 +3,7 @@ module github.com/infra-io/servicex
 go 1.21
 
 require (
-	github.com/FishGoddess/logit v1.5.8-alpha
+	github.com/FishGoddess/logit v1.5.9-alpha
 	go.uber.org/automaxprocs v1.5.3
 	google.golang.org/grpc v1.60.1
 )

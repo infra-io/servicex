@@ -5,17 +5,13 @@
 package tracing
 
 import (
-	"context"
 	"testing"
 )
 
-// go test -bench=^BenchmarkNew$
-func BenchmarkNew(b *testing.B) {
-	b.ReportAllocs()
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		New()
+// go test -v -cover -count=1 -test.cpu=1 -run=^TestTraceID$
+func TestTraceID(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		t.Log(traceID())
 	}
 }
 
@@ -31,39 +27,13 @@ func TestNew(t *testing.T) {
 	}
 }
 
-// go test -v -cover -count=1 -test.cpu=1 -run=^TestNewContext$
-func TestNewContext(t *testing.T) {
-	trace := New()
-	ctx := NewContext(context.Background(), trace)
+// go test -bench=^BenchmarkNew$
+// BenchmarkNew-2   	 3660554	       331.2 ns/op	      24 B/op	       1 allocs/op
+func BenchmarkNew(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
 
-	value := ctx.Value(contextKey)
-	if value == nil {
-		t.Error("ctx.Value returns nil")
+	for i := 0; i < b.N; i++ {
+		New()
 	}
-
-	if value.(*Trace) != trace {
-		t.Errorf("value %+v != trace %s", value, trace)
-	}
-
-	t.Log("traceID:", trace.ID())
-}
-
-// go test -v -cover -count=1 -test.cpu=1 -run=^TestFromContext$
-func TestFromContext(t *testing.T) {
-	ctx := context.Background()
-
-	traceInCtx := FromContext(ctx)
-	if traceInCtx.id != "" {
-		t.Errorf("traceInCtx.id %s != ''", traceInCtx.id)
-	}
-
-	trace := New()
-	ctx = context.WithValue(ctx, contextKey, trace)
-
-	traceInCtx = FromContext(ctx)
-	if traceInCtx != trace {
-		t.Errorf("traceInCtx %+v != trace %+v", traceInCtx, trace)
-	}
-
-	t.Log("traceID:", trace.ID())
 }

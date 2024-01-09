@@ -56,16 +56,16 @@ func Interceptor(timeout time.Duration, resolvers ...RequestResolver) grpc.Unary
 		defer cancel()
 
 		reqJson := jsonify(req)
-		logger.Debug(method+" begin", "request", reqJson)
+		logger.Debug("service method end", "request", reqJson)
 
 		defer func() {
 			cost := time.Since(beginTime)
 			respJson := jsonify(resp)
 
 			if err == nil {
-				logger.Debug(method+" end", "response", respJson, "cost", cost)
+				logger.Debug("service method end", "response", respJson, "cost", cost)
 			} else {
-				logger.Error(method+" end", "response", respJson, "err", err, "cost", cost)
+				logger.Error("service method end", "response", respJson, "err", err, "cost", cost)
 			}
 		}()
 

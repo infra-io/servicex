@@ -6,121 +6,69 @@ package grpc
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"path"
 	"time"
 
 	"github.com/FishGoddess/logit"
-	"github.com/infra-io/servicex/net/logging"
 	"github.com/infra-io/servicex/net/tracing"
 	"github.com/infra-io/servicex/runtime"
 	"google.golang.org/grpc"
 )
 
-func shortMethod(info *grpc.UnaryServerInfo) string {
-	if base := path.Base(info.FullMethod); base != "" {
-		return base
+func serviceMethod(info *grpc.UnaryServerInfo) string {
+	if method := path.Base(info.FullMethod); method != "" {
+		return method
 	}
 
 	return info.FullMethod
 }
 
-// TraceInterceptor sets a trace id to context.
-func TraceInterceptor() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
-		trace := tracing.New()
-		ctx = tracing.NewContext(ctx, trace)
-
-		return handler(ctx, req)
+func jsonify(v any) string {
+	marshaled, err := json.Marshal(v)
+	if err != nil {
+		return fmt.Sprintf("%+v", v)
 	}
+
+	return string(marshaled)
 }
 
-// LogInterceptor sets logging attributes to logger.
-func LogInterceptor(opts ...logging.Option) grpc.UnaryServerInterceptor {
-	conf := logging.NewDefaultConfig()
-
-	for _, opt := range opts {
-		opt.ApplyTo(conf)
-	}
-
-	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
-		args := make([]any, 0, 4)
-
-		if conf.WithTraceID {
-			trace := tracing.FromContext(ctx)
-			args = append(args, "service.trace_id", trace.ID())
-		}
-
-		if conf.WithServiceMethod {
-			method := shortMethod(info)
-			args = append(args, "service.method", method)
-		}
-
-		for _, resolve := range conf.Resolvers {
-			resolved := resolve(ctx, req)
-			args = append(args, resolved...)
-		}
-
-		logger := logit.FromContext(ctx).With(args...)
-		ctx = logit.NewContext(ctx, logger)
-
-		return handler(ctx, req)
-	}
-}
-
-// RecoveryInterceptor protects goroutine from panic.
-func RecoveryInterceptor() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
+func Interceptor(timeout time.Duration, resolvers ...RequestResolver) grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
 		defer func() {
 			if r := recover(); r != nil {
 				logit.FromContext(ctx).Error("recovery from panic", "r", r, "stack", runtime.Stack())
 			}
 		}()
 
-		return handler(ctx, req)
-	}
-}
+		beginTime := time.Now()
+		method := serviceMethod(info)
 
-// TimeoutInterceptor sets timeout to context.
-func TimeoutInterceptor(timeout time.Duration) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ any, err error) {
-		newCtx, cancel := context.WithTimeout(ctx, timeout)
+		trace := tracing.New()
+		ctx = tracing.NewContext(ctx, trace)
+
+		logger := newLogger(ctx, method, trace, req, resolvers...)
+		ctx = logit.NewContext(ctx, logger)
+
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, timeout)
 		defer cancel()
 
-		return handler(newCtx, req)
-	}
-}
-
-// CostInterceptor records the cost of method.
-func CostInterceptor() grpc.UnaryServerInterceptor {
-	type Req struct {
-		Request any `json:"request"`
-	}
-
-	type Resp struct {
-		Response any `json:"response"`
-	}
-
-	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
-		begin := time.Now()
-
-		logger := logit.FromContext(ctx)
-		logger.Debug("service method begin", "request", Req{req})
+		reqJson := jsonify(req)
+		logger.Debug(method+" begin", "request", reqJson)
 
 		defer func() {
-			cost := time.Since(begin)
-			logger.Debug("service method end", "response", Resp{resp}, "err", err, "cost", cost)
+			cost := time.Since(beginTime)
+			respJson := jsonify(resp)
+
+			if err == nil {
+				logger.Debug(method+" end", "response", respJson, "cost", cost)
+			} else {
+				logger.Error(method+" end", "response", respJson, "err", err, "cost", cost)
+			}
 		}()
 
 		return handler(ctx, req)
 	}
-}
-
-func BaseInterceptors(timeout time.Duration, opts ...logging.Option) []grpc.UnaryServerInterceptor {
-	opts = append(opts, logging.WithTraceID(), logging.WithServiceMethod())
-
-	interceptors := []grpc.UnaryServerInterceptor{
-		TraceInterceptor(), LogInterceptor(opts...), RecoveryInterceptor(), TimeoutInterceptor(timeout), CostInterceptor(),
-	}
-
-	return interceptors
 }

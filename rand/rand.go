@@ -12,7 +12,7 @@ import (
 
 var random *rand.Rand
 
-var words = [62]byte{
+var words = []byte{
 	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 	'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
 	'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
@@ -26,15 +26,21 @@ func init() {
 	random = rand.New(source)
 }
 
-// GenerateString generates a string including n words in random.
-func GenerateString(n int) string {
-	bs := make([]byte, n)
+func AppendBytes(bs []byte, n int) []byte {
 	length := len(words)
 
 	for i := 0; i < n; i++ {
 		index := random.Intn(length)
-		bs[i] = words[index]
+		bs = append(bs, words[index])
 	}
+
+	return bs
+}
+
+// GenerateString generates a string including n words in random.
+func GenerateString(n int) string {
+	bs := make([]byte, 0, n)
+	bs = AppendBytes(bs, n)
 
 	return string(bs)
 }

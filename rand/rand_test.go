@@ -9,6 +9,22 @@ import (
 	"testing"
 )
 
+// go test -v -cover -count=1 -test.cpu=1 -run=^TestAppendBytes$
+func TestAppendBytes(t *testing.T) {
+	n := 32
+
+	for i := 0; i < 10; i++ {
+		bs := make([]byte, 0, n)
+		bs = AppendBytes(bs, n)
+
+		if len(bs) != n {
+			t.Errorf("bs length %d is wrong", len(bs))
+		}
+
+		t.Log(string(bs))
+	}
+}
+
 // go test -v -cover -count=1 -test.cpu=1 -run=^TestGenerateString$
 func TestGenerateString(t *testing.T) {
 	n := 32

@@ -1,5 +1,14 @@
 ## ✒ 历史版本的特性介绍 (Features in old versions)
 
+### v0.2.10-alpha
+
+> 此版本发布于 2024-01-09
+
+* 继续调整拦截器的代码风格
+* 调整 tracing 代码
+* 增加 rand.AppendBytes 方法
+* 升级使用到的全部依赖
+
 ### v0.2.6-alpha
 
 > 此版本发布于 2024-01-03

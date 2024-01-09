@@ -10,13 +10,13 @@ import (
 	"google.golang.org/grpc"
 )
 
-// go test -v -cover -count=1 -test.cpu=1 -run=^TestShortMethod$
-func TestShortMethod(t *testing.T) {
+// go test -v -cover -count=1 -test.cpu=1 -run=^TestServiceMethod$
+func TestServiceMethod(t *testing.T) {
 	info := &grpc.UnaryServerInfo{
 		FullMethod: "/package.service/method",
 	}
 
-	method := shortMethod(info)
+	method := serviceMethod(info)
 	if method != "method" {
 		t.Errorf("method %s is wrong", method)
 	}

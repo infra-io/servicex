@@ -5,16 +5,16 @@
 package tracing
 
 import (
-	"context"
-)
+	"strconv"
 
-var contextKey = struct{}{}
+	"github.com/infra-io/servicex/rand"
+	"github.com/infra-io/servicex/time"
+)
 
 type Trace struct {
 	id string
 }
 
-// New returns a new trace.
 func New() *Trace {
 	trace := &Trace{
 		id: traceID(),
@@ -27,18 +27,20 @@ func (t *Trace) ID() string {
 	return t.id
 }
 
-// NewContext creates a new context with given trace.
-func NewContext(ctx context.Context, trace *Trace) context.Context {
-	ctx = context.WithValue(ctx, contextKey, trace)
-	return ctx
+func today() int64 {
+	now := time.Now().Unix()
+	now = now / 3600
+
+	return now
 }
 
-// FromContext returns the trace from context.
-func FromContext(ctx context.Context) *Trace {
-	trace, ok := ctx.Value(contextKey).(*Trace)
-	if !ok {
-		return new(Trace)
-	}
+func traceID() string {
+	bs := make([]byte, 0, 24)
+	bs = rand.AppendBytes(bs, 9)
 
-	return trace
+	// It will append 6 bytes before 2084/01/29.
+	bs = strconv.AppendInt(bs, today(), 10)
+
+	bs = rand.AppendBytes(bs, 9)
+	return string(bs)
 }

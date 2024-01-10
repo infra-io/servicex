@@ -10,9 +10,9 @@ import (
 	"time"
 )
 
-var random *rand.Rand
+var random = rand.New(rand.NewSource(time.Now().Unix()))
 
-var words = []byte{
+var numbersAndLetters = []byte{
 	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 	'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
 	'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
@@ -20,18 +20,13 @@ var words = []byte{
 	'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 }
 
-func init() {
-	now := time.Now().Unix()
-	source := rand.NewSource(now)
-	random = rand.New(source)
-}
-
+// AppendBytes appends n bytes to bs in random.
 func AppendBytes(bs []byte, n int) []byte {
-	length := len(words)
+	length := len(numbersAndLetters)
 
 	for i := 0; i < n; i++ {
 		index := random.Intn(length)
-		bs = append(bs, words[index])
+		bs = append(bs, numbersAndLetters[index])
 	}
 
 	return bs

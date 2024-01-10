@@ -6,33 +6,14 @@ package grpc
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"path"
 	"time"
 
 	"github.com/FishGoddess/logit"
 	"github.com/infra-io/servicex/net/tracing"
 	"github.com/infra-io/servicex/runtime"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
-
-func serviceMethod(info *grpc.UnaryServerInfo) string {
-	if method := path.Base(info.FullMethod); method != "" {
-		return method
-	}
-
-	return info.FullMethod
-}
-
-func jsonify(v any) string {
-	marshaled, err := json.Marshal(v)
-	if err != nil {
-		return fmt.Sprintf("%+v", v)
-	}
-
-	return string(marshaled)
-}
 
 func Interceptor(timeout time.Duration, resolvers ...RequestResolver) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
@@ -69,6 +50,11 @@ func Interceptor(timeout time.Duration, resolvers ...RequestResolver) grpc.Unary
 			}
 		}()
 
-		return handler(ctx, req)
+		grpc.SetHeader(ctx, metadata.Pairs(ServiceKeyTraceID, trace.ID()))
+		if resp, err = handler(ctx, req); err != nil {
+			err = WrapWithStatus(ctx, err)
+		}
+
+		return resp, err
 	}
 }

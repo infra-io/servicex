@@ -11,10 +11,15 @@ import (
 	"github.com/infra-io/servicex/net/tracing"
 )
 
+const (
+	ServiceKeyMethod  = "service.method"
+	ServiceKeyTraceID = "service.trace_id"
+)
+
 type RequestResolver func(ctx context.Context, request any) []any
 
 func newLogger(ctx context.Context, method string, trace *tracing.Trace, req any, resolvers ...RequestResolver) *logit.Logger {
-	args := []any{"service.trace_id", trace.ID(), "service.method", method}
+	args := []any{ServiceKeyTraceID, trace.ID(), ServiceKeyMethod, method}
 
 	for _, resolve := range resolvers {
 		resolved := resolve(ctx, req)

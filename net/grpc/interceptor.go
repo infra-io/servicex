@@ -15,6 +15,7 @@ import (
 	"github.com/infra-io/servicex/net/tracing"
 	"github.com/infra-io/servicex/runtime"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 func serviceMethod(info *grpc.UnaryServerInfo) string {
@@ -69,6 +70,11 @@ func Interceptor(timeout time.Duration, resolvers ...RequestResolver) grpc.Unary
 			}
 		}()
 
-		return handler(ctx, req)
+		grpc.SetHeader(ctx, metadata.Pairs(ServiceKeyTraceID, trace.ID()))
+		if resp, err = handler(ctx, req); err != nil {
+			err = WrapWithStatus(ctx, err)
+		}
+
+		return resp, err
 	}
 }

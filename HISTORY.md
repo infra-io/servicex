@@ -1,5 +1,13 @@
 ## ✒ 历史版本的特性介绍 (Features in old versions)
 
+### v0.2.16-alpha
+
+> 此版本发布于 2024-01-11
+
+* 拦截器增加将 trace id 写到 metadata 的逻辑
+* 拦截器增加包装 error 为 status 的逻辑
+* 增加 metadata 获取数据的函数
+
 ### v0.2.13-alpha
 
 > 此版本发布于 2024-01-09

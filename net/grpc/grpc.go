@@ -5,11 +5,12 @@
 package grpc
 
 import (
-	"encoding/json"
 	"fmt"
 	"path"
 
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 func serviceMethod(info *grpc.UnaryServerInfo) string {
@@ -21,7 +22,15 @@ func serviceMethod(info *grpc.UnaryServerInfo) string {
 }
 
 func jsonify(v any) string {
-	marshaled, err := json.Marshal(v)
+	jpb := &runtime.JSONPb{
+		MarshalOptions: protojson.MarshalOptions{
+			UseProtoNames:     true,
+			EmitUnpopulated:   true,
+			EmitDefaultValues: true,
+		},
+	}
+
+	marshaled, err := jpb.Marshal(v)
 	if err != nil {
 		return fmt.Sprintf("%+v", v)
 	}

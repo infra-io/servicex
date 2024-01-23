@@ -11,22 +11,6 @@ import (
 	"github.com/infra-io/servicex/time"
 )
 
-type Trace struct {
-	id string
-}
-
-func New() *Trace {
-	trace := &Trace{
-		id: traceID(),
-	}
-
-	return trace
-}
-
-func (t *Trace) ID() string {
-	return t.id
-}
-
 func today() int64 {
 	now := time.Now().Unix()
 	now = now / 3600
@@ -43,4 +27,20 @@ func traceID() string {
 
 	bs = rand.AppendBytes(bs, 9)
 	return string(bs)
+}
+
+type Trace struct {
+	id string
+}
+
+func New() *Trace {
+	trace := &Trace{
+		id: traceID(),
+	}
+
+	return trace
+}
+
+func (t *Trace) ID() string {
+	return t.id
 }

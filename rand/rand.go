@@ -5,45 +5,39 @@
 package rand
 
 import (
-	"encoding/base64"
 	"math/rand"
 	"time"
+	"unsafe"
 )
 
-var random = rand.New(rand.NewSource(time.Now().Unix()))
+const words = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-var numbersAndLetters = []byte{
-	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-	'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-	'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-	'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-}
+var source = rand.NewSource(time.Now().Unix())
 
 // AppendBytes appends n bytes to bs in random.
 func AppendBytes(bs []byte, n int) []byte {
-	length := len(numbersAndLetters)
+	length := int64(len(words))
 
 	for i := 0; i < n; i++ {
-		index := random.Intn(length)
-		bs = append(bs, numbersAndLetters[index])
+		index := source.Int63() % length
+		bs = append(bs, words[index])
 	}
+
+	return bs
+}
+
+// GenerateBytes generates a byte slice including n words in random.
+func GenerateBytes(n int) []byte {
+	bs := make([]byte, 0, n)
+	bs = AppendBytes(bs, n)
 
 	return bs
 }
 
 // GenerateString generates a string including n words in random.
 func GenerateString(n int) string {
-	bs := make([]byte, 0, n)
-	bs = AppendBytes(bs, n)
+	bs := GenerateBytes(n)
 
-	return string(bs)
-}
-
-// GenerateToken generates a string in base64 for token usages.
-func GenerateToken(n int) string {
-	raw := GenerateString(n)
-	token := base64.StdEncoding.EncodeToString([]byte(raw))
-
-	return token
+	// Learn from strings.Builder.String()
+	return *(*string)(unsafe.Pointer(&bs))
 }

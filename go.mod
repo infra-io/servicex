@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/FishGoddess/errors v0.5.2
-	github.com/FishGoddess/logit v1.5.9-alpha
+	github.com/FishGoddess/logit v1.5.10
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.0
 	go.uber.org/automaxprocs v1.5.3
 	google.golang.org/grpc v1.60.1

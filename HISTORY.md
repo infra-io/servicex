@@ -1,5 +1,14 @@
 ## ✒ 历史版本的特性介绍 (Features in old versions)
 
+### v0.3.0
+
+> 此版本发布于 2024-01-23
+
+* 去除 GenerateToken 方法
+* GenerateString 方法性能提升了 2.3 倍
+* Trace 的 New 方法性能提升了 2.3 倍
+* 增加 GenerateBytes 方法
+
 ### v0.2.17-alpha
 
 > 此版本发布于 2024-01-11

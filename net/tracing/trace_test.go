@@ -28,7 +28,7 @@ func TestNew(t *testing.T) {
 }
 
 // go test -bench=^BenchmarkNew$
-// BenchmarkNew-2   	 3660554	       331.2 ns/op	      24 B/op	       1 allocs/op
+// BenchmarkNew-2   	 8578635	       141.8 ns/op	      24 B/op	       1 allocs/op
 func BenchmarkNew(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()

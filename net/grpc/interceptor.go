@@ -23,6 +23,12 @@ func Interceptor(timeout time.Duration, resolvers ...RequestResolver) grpc.Unary
 			}
 		}()
 
+		defer func() {
+			if err != nil {
+				err = WrapWithStatus(ctx, err)
+			}
+		}()
+
 		beginTime := time.Now()
 		method := serviceMethod(info)
 
@@ -46,15 +52,11 @@ func Interceptor(timeout time.Duration, resolvers ...RequestResolver) grpc.Unary
 			if err == nil {
 				logger.Debug("service method end", "response", respJson, "cost", cost)
 			} else {
-				logger.Error("service method end", "response", respJson, "err", err, "cost", cost)
+				logger.Error("service method end", "err", err, "request", reqJson, "response", respJson, "cost", cost)
 			}
 		}()
 
 		grpc.SetHeader(ctx, metadata.Pairs(ServiceKeyTraceID, trace.ID()))
-		if resp, err = handler(ctx, req); err != nil {
-			err = WrapWithStatus(ctx, err)
-		}
-
-		return resp, err
+		return handler(ctx, req)
 	}
 }

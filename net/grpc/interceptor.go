@@ -18,12 +18,14 @@ import (
 func Interceptor(timeout time.Duration, resolvers ...RequestResolver) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
 		defer func() {
-			if err != nil {
-				err = WrapWithStatus(ctx, err)
-			}
-
 			if r := recover(); r != nil {
 				logit.FromContext(ctx).Error("recovery from panic", "r", r, "stack", runtime.Stack())
+			}
+		}()
+
+		defer func() {
+			if err != nil {
+				err = WrapWithStatus(ctx, err)
 			}
 		}()
 

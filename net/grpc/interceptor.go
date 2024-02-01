@@ -18,6 +18,10 @@ import (
 func Interceptor(timeout time.Duration, resolvers ...RequestResolver) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
 		defer func() {
+			if err != nil {
+				err = WrapWithStatus(ctx, err)
+			}
+
 			if r := recover(); r != nil {
 				logit.FromContext(ctx).Error("recovery from panic", "r", r, "stack", runtime.Stack())
 			}
@@ -46,15 +50,11 @@ func Interceptor(timeout time.Duration, resolvers ...RequestResolver) grpc.Unary
 			if err == nil {
 				logger.Debug("service method end", "response", respJson, "cost", cost)
 			} else {
-				logger.Error("service method end", "response", respJson, "err", err, "cost", cost)
+				logger.Error("service method end", "err", err, "request", reqJson, "response", respJson, "cost", cost)
 			}
 		}()
 
 		grpc.SetHeader(ctx, metadata.Pairs(ServiceKeyTraceID, trace.ID()))
-		if resp, err = handler(ctx, req); err != nil {
-			err = WrapWithStatus(ctx, err)
-		}
-
-		return resp, err
+		return handler(ctx, req)
 	}
 }

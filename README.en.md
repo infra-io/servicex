@@ -11,7 +11,6 @@
 
 ### 🥇 Features
 
-* Some grpc interceptors, such as timeout/panic/cost
 * Trace id generate and pass by context
 * Random string generate, token string generate
 * Stack information getter, set max proc automatically

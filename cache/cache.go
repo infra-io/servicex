@@ -14,8 +14,8 @@ import (
 func New(name string, opts ...cachego.Option) cachego.Cache {
 	defaultOpts := []cachego.Option{
 		cachego.WithCacheName(name),
-		cachego.WithShardings(16),    // 16 个分片
-		cachego.WithMaxEntries(5000), // 单个分片的最大数量，总共是 8w 个
+		cachego.WithShardings(16),
+		cachego.WithMaxEntries(5000),
 		cachego.WithGC(10 * time.Minute),
 		cachego.WithRecordLoad(false),
 		cachego.WithReportGC(reportCacheGC),

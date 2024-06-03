@@ -7,7 +7,7 @@ package logging
 import (
 	"context"
 
-	"github.com/infra-io/servicex/observability/tracing"
+	"github.com/infra-io/servicex/observe/tracing"
 )
 
 const (

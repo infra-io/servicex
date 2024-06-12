@@ -1,5 +1,7 @@
 github.com/FishGoddess/cachego v0.6.1 h1:mbytec3loqw5dcO177LyRGyStKG0AngP5g2GR3SzSh0=
 github.com/FishGoddess/cachego v0.6.1/go.mod h1:VLSMwWRlRPazjGYer8pq+4aDrIe1Otj3Yy9HAb0eo3c=
+github.com/FishGoddess/cryptox v0.4.3 h1:EP1732fzkkgWKi7RSdVje+/pN8WeYFtzdHhJG4JcSs4=
+github.com/FishGoddess/cryptox v0.4.3/go.mod h1:1j6yGIdxvxJ/V0XThrGhZ+c0NzMi0WxO7WeDFTfNyIM=
 github.com/FishGoddess/logit v1.5.10 h1:Di4la3onpM23DMInaJ4L93D6TUAX4woRG6EUiz9lQ9Q=
 github.com/FishGoddess/logit v1.5.10/go.mod h1:6IAtVuIW3AaPTBn2NDfBnML7t0F7/wj1FFeWIPLJy98=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

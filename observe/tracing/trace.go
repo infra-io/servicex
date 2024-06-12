@@ -7,7 +7,7 @@ package tracing
 import (
 	"strconv"
 
-	"github.com/infra-io/servicex/rand"
+	"github.com/FishGoddess/cryptox"
 	"github.com/infra-io/servicex/time"
 )
 
@@ -20,12 +20,12 @@ func today() int64 {
 
 func traceID() string {
 	bs := make([]byte, 0, 24)
-	bs = rand.AppendBytes(bs, 9)
+	bs = cryptox.AppendBytes(bs, 9)
 
 	// It will append 6 bytes before 2084/01/29.
 	bs = strconv.AppendInt(bs, today(), 10)
 
-	bs = rand.AppendBytes(bs, 9)
+	bs = cryptox.AppendBytes(bs, 9)
 	return string(bs)
 }
 
